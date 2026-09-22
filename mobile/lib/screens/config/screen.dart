@@ -25,39 +25,38 @@ class _ConfigScreenState extends State<ConfigScreen> {
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          // crossAxisAlignment: .stretch,
           children: [
             IntrinsicWidth(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 250,
-                    child: TextField(
-                      controller: context
-                          .read<ConfigProvider>()
-                          .receiverIpController,
-                      decoration: InputDecoration(
-                        label: Text("Receiver IP's"),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(0),
-                            bottomRight: Radius.circular(0),
+              child: IntrinsicHeight(
+                child: Row(
+                  spacing: 0,
+                  crossAxisAlignment: .stretch,
+                  children: [
+                    SizedBox(
+                      width: 250,
+                      child: TextField(
+                        controller: context
+                            .read<ConfigProvider>()
+                            .receiverIpController,
+                        decoration: InputDecoration(
+                          label: Text("Receiver IP's"),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              bottomLeft: Radius.circular(20),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: IconButtonWidget(
+                    IconButtonWidget(
                       child: Icon(Icons.done),
                       onPressed: () {
                         context.read<ConfigProvider>().set(context.read<ConfigProvider>().receiverIpController.text);
                       },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

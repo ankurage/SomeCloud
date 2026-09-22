@@ -16,3 +16,13 @@ class ConfigProvider with ChangeNotifier {
     receiverIpController.text = "receiverIp";
   }
 }
+
+// class ClipBoardProvider with ChangeNotifier {
+//   var clipboard;
+
+  // Future<void> update() async {
+  //   var text = await Clipboard.getData(Clipboard.kTextPlain);
+  //   clipboard = clipboard?.text;
+    
+  // }
+// }

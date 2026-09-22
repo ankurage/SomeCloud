@@ -1,5 +1,33 @@
 import 'package:flutter/material.dart';
 
+class AnimatedElevatedButton extends StatefulWidget {
+  @override
+  State<AnimatedElevatedButton> createState() => _AnimatedElevatedButtonState();
+}
+
+class _AnimatedElevatedButtonState extends State<AnimatedElevatedButton> {
+  double horizontPadding = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (a) => setState(() {
+        horizontPadding = 30;
+      }),
+      onTapUp: (a) => setState(() {
+        horizontPadding = 10;
+      }),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsetsGeometry.symmetric(horizontal: horizontPadding)
+        ),
+        onPressed: null,
+        child: Text("Button!")
+      ),
+    );
+  }
+}
+
 class IconButtonWidget extends StatelessWidget {
   Widget child;
   VoidCallback onPressed;
@@ -16,7 +44,7 @@ class IconButtonWidget extends StatelessWidget {
     var theme = Theme.of(context);
 
     return IconButton(
-      padding: EdgeInsets.symmetric(vertical: 13),
+      // padding: EdgeInsets.symmetric(vertical: 13),
       style: IconButton.styleFrom(
         backgroundColor: theme.primaryColor,
         shape: RoundedRectangleBorder(

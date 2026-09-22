@@ -1,4 +1,6 @@
 import socket
+import pyperclip
+
 
 HOST = "0.0.0.0"
 PORT = 5000
@@ -19,6 +21,7 @@ while True:
     #     break
 
     print("Received:", data.decode())
+    pyperclip.copy(data.decode())
 
-conn.close()
-server.close()
+    conn.close()
+# server.close()

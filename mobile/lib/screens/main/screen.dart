@@ -42,38 +42,61 @@ class _MainScreenState extends State<MainScreen> {
             //     itemCount: 1,
             //   ),
             // ),
-
             IntrinsicWidth(
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 250,
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        label: Consumer<ConfigProvider>(
-                          builder: (context, value, child) => Text("Message To ${value.ip}"),
-                          // child: Text("Message To ${context.read<ConfigProvider>().ip}")
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(0),
-                            bottomRight: Radius.circular(0),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButtonWidget(
-                    child: Icon(Icons.send),
-                    onPressed: sendMessage,
-                  ),
-                ],
+              child: IntrinsicHeight(
+                child: MessageField(messageController: _messageController),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class MessageField extends StatefulWidget {
+  const MessageField({
+    super.key,
+    required this._messageController,
+  });
+
+  final TextEditingController _messageController;
+
+  @override
+  State<MessageField> createState() => _MessageFieldState();
+}
+
+class _MessageFieldState extends State<MessageField> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: 0,
+      crossAxisAlignment: .stretch,
+      children: [
+        SizedBox(
+          width: 250,
+          child: TextField(
+            controller: widget._messageController,
+            decoration: InputDecoration(
+              label: Consumer<ConfigProvider>(
+                builder: (context, value, child) =>
+                    Text("Message To ${value.ip}"),
+                // child: Text("Message To ${context.read<ConfigProvider>().ip}")
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  bottomLeft: Radius.circular(20)
+                )
+              ),
+            ),
+          ),
+        ),
+        IconButtonWidget(
+          child: Icon(Icons.send),
+          onPressed: sendMessage,
+        ),
+      ],
     );
   }
 
@@ -83,7 +106,7 @@ class _MainScreenState extends State<MainScreen> {
       5000,
     );
 
-    socket.write(_messageController.text);
+    socket.write(widget._messageController.text);
 
     await socket.flush();
     await socket.close();
