@@ -1,42 +1,16 @@
 import 'package:flutter/material.dart';
 
-class AnimatedElevatedButton extends StatefulWidget {
-  @override
-  State<AnimatedElevatedButton> createState() => _AnimatedElevatedButtonState();
-}
-
-class _AnimatedElevatedButtonState extends State<AnimatedElevatedButton> {
-  double horizontPadding = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (a) => setState(() {
-        horizontPadding = 30;
-      }),
-      onTapUp: (a) => setState(() {
-        horizontPadding = 10;
-      }),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsetsGeometry.symmetric(horizontal: horizontPadding)
-        ),
-        onPressed: null,
-        child: Text("Button!")
-      ),
-    );
-  }
-}
-
 class IconButtonWidget extends StatelessWidget {
   Widget child;
   VoidCallback onPressed;
-  bool left; // false - turn right | true - turn left
+  bool ?left; // false - turn right | true - turn left
+  double cornerRound = 0;
 
   IconButtonWidget({
     required this.child,
     required this.onPressed,
-    this.left = false,
+    this.left,
+    this.cornerRound = 20
   });
 
   @override
@@ -49,10 +23,18 @@ class IconButtonWidget extends StatelessWidget {
         backgroundColor: theme.primaryColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(left ? 0 : 20),
-            bottomRight: Radius.circular(left ? 0 : 20),
-            bottomLeft: Radius.circular(left ? 20 : 0),
-            topLeft: Radius.circular(left ? 20 : 0),
+            topRight: left == null
+              ? Radius.circular(cornerRound)
+              : (left == true ? Radius.zero : Radius.circular(cornerRound)),
+            bottomRight: left == null
+              ? Radius.circular(cornerRound)
+              : (left == true ? Radius.zero : Radius.circular(cornerRound)),
+            bottomLeft: left == null
+              ? Radius.circular(cornerRound)
+              : (left == true ? Radius.circular(cornerRound) : Radius.zero),
+            topLeft: left == null
+              ? Radius.circular(cornerRound)
+              : (left == true ? Radius.circular(cornerRound) : Radius.zero),
           ),
         ),
       ),

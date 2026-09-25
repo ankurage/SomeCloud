@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -8,48 +5,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+import 'backgroundService/service.dart';
 import 'provider/config_provider.dart';
 import 'screens/screens.dart';
 
-Future update() async {
-  var text = await Clipboard.getData(Clipboard.kTextPlain);
-  return text?.text;
-}
-
-void startBackgroundService() {
-  final service = FlutterBackgroundService();
-  service.startService();
-}
-
-@pragma('vm:entry-point')
-Future<bool> onIosBackground(ServiceInstance service) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized();
-
-  return true;
-}
-
-@pragma('vm:entry-point')
-void onStart(ServiceInstance service) async {
-  DartPluginRegistrant.ensureInitialized();
-  if (service is AndroidServiceInstance) {
-    service.on("setAsForeground").listen((event) {
-      service.setAsForegroundService();
-    });
-    service.on("setAsBackground").listen((event) {
-      service.setAsBackgroundService();
-    });
-  }
-  service.on("stopService").listen((event) {
-    service.stopSelf();
-  });
-
-  Timer.periodic(Duration(seconds: 1), (timer) async {
-    print(await update());
-  });
-}
-
-Future<void> initializeService() async {
+Future<void> initializeService(ConfigProvider configProv) async {
   final service = FlutterBackgroundService();
 
   await service.configure(
@@ -65,11 +25,53 @@ Future<void> initializeService() async {
       autoStartOnBoot: true,
     ),
   );
+
+  service.on("getClipboard").listen((event) async {
+    final clip = await Clipboard.getData(Clipboard.kTextPlain);
+    service.invoke("clipboardResult", {
+      "text": clip?.text,
+      "receiverIp": configProv.ip,
+      "portSync": configProv.port
+    });
+  });
+
+  service.startService();
 }
 
 void main() async {
+  // final background = BackgroundServiceProvider();
+  final config = ConfigProvider();
+
   WidgetsFlutterBinding.ensureInitialized();
+  
+  runApp(
+    MultiProvider(
+      providers: [
+        // ChangeNotifierProvider(
+        //   create: (context) => background
+        // ),
+        ChangeNotifierProvider(
+          create: (context) => config
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
+
   await Hive.initFlutter();
+  var box = await Hive.openBox("cfg");
+  // box.clear();
+  print(box.values);
+  if (box.isEmpty) {
+    box.add(
+      {
+        "receiverIp": "192.168.1.1",
+        "portSync": 5000
+      }
+    );
+  }
+  var data = box.get(0);
+  config.set(data["receiverIp"], data["portSync"]);
 
   await Permission.notification.isDenied.then(
     (value) {
@@ -79,16 +81,7 @@ void main() async {
     }
   );
 
-  await initializeService();
-
-  FlutterBackgroundService().invoke("setAsForeground");
-
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ConfigProvider(),
-      child: const MyApp(),
-    ),
-  );
+  await initializeService(config);
 }
 
 class MyApp extends StatelessWidget {
