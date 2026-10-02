@@ -18,10 +18,20 @@ class _ConfigScreenState extends State<ConfigScreen> {
     confProvider.portSyncController.text = confProvider.port.toString();
   }
 
+  Future saveConfig() async {
+    var confProvider = context.read<ConfigProvider>();
+    confProvider.set(confProvider.receiverIpController.text, int.parse(confProvider.portSyncController.text));
+    var box = await Hive.openBox("cfg");
+    box.putAt(0, {
+      "receiverIp": "${confProvider.receiverIpController.text}",
+      "port": confProvider.port
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    var confProvider = context.read<ConfigProvider>();
+    
     return Scaffold(
       appBar: AppBar(title: Text("MyShare")),
       body: Padding(
@@ -43,14 +53,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                 Text("Save"),
                 Icon(Icons.done)
               ],),
-              onPressed: () async {
-                confProvider.set(confProvider.receiverIpController.text, int.parse(confProvider.portSyncController.text));
-                var box = await Hive.openBox("cfg");
-                box.putAt(0, {
-                  "receiverIp": "${confProvider.receiverIpController.text}",
-                  "port": confProvider.port
-                });
-              },
+              onPressed: () => saveConfig()
             ),
           ],
         ),

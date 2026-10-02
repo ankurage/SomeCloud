@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -29,7 +31,7 @@ Future<void> initializeService(ConfigProvider configProv) async {
   service.on("getClipboard").listen((event) async {
     final clip = await Clipboard.getData(Clipboard.kTextPlain);
     service.invoke("clipboardResult", {
-      "text": clip?.text,
+      "text": clip?.text ?? "",
       "receiverIp": configProv.ip,
       "portSync": configProv.port
     });
@@ -43,6 +45,30 @@ void main() async {
   final config = ConfigProvider();
 
   WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  await Hive.initFlutter();
+  await startServer(config);
+
+  var box = await Hive.openBox("cfg");
+  if (box.isEmpty) {
+    box.add(
+      {
+        "receiverIp": "192.168.1.1",
+        "portSync": 5000
+      }
+    );
+  }
+  var data = box.get(0);
+  config.set(data["receiverIp"] ?? "192.168.1.1", data["portSync"] ?? 5000);
+
+  await Permission.notification.isDenied.then(
+    (value) {
+      if (value) {
+        Permission.notification.request();
+      }
+    }
+  );
+  await initializeService(config);
   
   runApp(
     MultiProvider(
@@ -57,31 +83,6 @@ void main() async {
       child: const MyApp(),
     ),
   );
-
-  await Hive.initFlutter();
-  var box = await Hive.openBox("cfg");
-  // box.clear();
-  print(box.values);
-  if (box.isEmpty) {
-    box.add(
-      {
-        "receiverIp": "192.168.1.1",
-        "portSync": 5000
-      }
-    );
-  }
-  var data = box.get(0);
-  config.set(data["receiverIp"], data["portSync"]);
-
-  await Permission.notification.isDenied.then(
-    (value) {
-      if (value) {
-        Permission.notification.request();
-      }
-    }
-  );
-
-  await initializeService(config);
 }
 
 class MyApp extends StatelessWidget {
