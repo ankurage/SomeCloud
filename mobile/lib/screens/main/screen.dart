@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:mobile/provider/config_provider.dart';
-import 'package:mobile/widgets/buttons_widget.dart';
+import 'package:mobile/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -54,30 +54,44 @@ class _MainScreenState extends State<MainScreen> {
             MessageField(messageController: _messageController),
             Align(
               alignment: .bottomCenter,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: IconButtonWidget(
-                        buttonPadding: EdgeInsetsGeometry.symmetric(vertical: 20),
-                        child: isServiceActive ? Text("Stop Sync") : Text("Start Sync"),
-                        onPressed: () {
-                          if (isServiceActive) {
-                            FlutterBackgroundService().invoke("stopService");
-                          } else {
-                            FlutterBackgroundService().startService();
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              child: StopSyncButton(isServiceActive: isServiceActive),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class StopSyncButton extends StatelessWidget {
+  const StopSyncButton({
+    super.key,
+    required this.isServiceActive,
+  });
+
+  final bool isServiceActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButtonWidget(
+              buttonPadding: EdgeInsetsGeometry.symmetric(vertical: 20),
+              child: isServiceActive ? Text("Stop Sync") : Text("Start Sync"),
+              onPressed: () {
+                if (isServiceActive) {
+                  FlutterBackgroundService().invoke("stopService");
+                } else {
+                  FlutterBackgroundService().startService();
+                }
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -130,7 +144,7 @@ class _MessageFieldState extends State<MessageField> {
           mainAxisAlignment: .center,
           mainAxisSize: .min,
           children: [
-            IconButtonBackgroundWidget(
+            MultiTextFielBackgrounddWidget(
               buttonPadding: .symmetric(vertical: 17, horizontal: 17),
               onPressedSuffix: sendMessage,
               onPressedPrefix: serversListToggle,

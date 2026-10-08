@@ -47,18 +47,22 @@ void onStart(ServiceInstance service) async {
     if (oldClip == text) {return;}
     
     else {
-      final socket = await Socket.connect(
-        event?["receiverIp"], // IP ноутбука
-        event?["portSync"],
-      );
+      try {
+        final socket = await Socket.connect(
+            event?["receiverIp"], // IP ноутбука
+            event?["portSync"],
+          );
 
-      socket.write(text);
+          socket.write(text);
 
-      await socket.flush();
-      await socket.close();
-      oldClip = text;
-      socket.close();
-    }
+          await socket.flush();
+          await socket.close();
+          oldClip = text;
+          socket.close();
+        } on SocketException catch (e) {
+          print("Server unvaible: $e");
+        }
+      }
   });
 
   Timer.periodic(Duration(seconds: 1), (timer) async {
@@ -69,6 +73,7 @@ void onStart(ServiceInstance service) async {
       }
     }
 
+    print("1");
     
   });
 }

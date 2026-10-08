@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import '../../widgets/widgets.dart';
 
 import '../../provider/config_provider.dart';
 
@@ -40,29 +42,39 @@ class _ConfigScreenState extends State<ConfigScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("MyShare")),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(70.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                spacing: 0,
+        child: Stack(
+          children: [
+            Align(
+              alignment: .center,
+              child: Padding(
+                padding: const EdgeInsets.all(50.0),
+                child: DoubleTextFieldBackgrounddWidget(
+                  fieldOne: Expanded(child: PortFieldWidget()),
+                  fieldTwo: Expanded(child: ReceiverIpFieldWidget()),
+                ),
+              ),
+            ),
+            Align(
+              alignment: .bottomCenter,
+              child: Row(
                 children: [
-                  Expanded(child: ReceiverIpFieldWidget()),
-                  Expanded(child: PortFieldWidget())
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: IconButtonWidget(
+                        buttonPadding: EdgeInsetsGeometry.symmetric(vertical: 20),
+                        onPressed: saveConfig,
+                        child: Row(mainAxisAlignment: .center, children: [
+                          Text("Save"),
+                          Icon(Icons.done)
+                        ],),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              ElevatedButton(
-                child: Row(mainAxisAlignment: .center, children: [
-                  Text("Save"),
-                  Icon(Icons.done)
-                ],),
-                onPressed: () => saveConfig()
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -77,17 +89,22 @@ class PortFieldWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly
+      ],
+      textAlign: TextAlign.center,
       controller: context
           .read<ConfigProvider>()
           .portSyncController,
       decoration: InputDecoration(
-        label: Text("Port"),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
+        label: Row(
+          mainAxisAlignment: .center,
+          children: [
+            Text("Port"),
+          ],
         ),
+        border: InputBorder.none
       ),
     );
   }
@@ -101,17 +118,22 @@ class ReceiverIpFieldWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      textAlign: .center,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r"[0-9]"), replacementString: ".")
+      ],
       controller: context
           .read<ConfigProvider>()
           .receiverIpController,
       decoration: InputDecoration(
-        label: Text("Receiver IP's"),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            bottomLeft: Radius.circular(20),
-          ),
+        label: Row(
+          mainAxisAlignment: .center,
+          children: [
+            Text("Receiver IP's"),
+          ],
         ),
+        border: InputBorder.none
       ),
     );
   }
