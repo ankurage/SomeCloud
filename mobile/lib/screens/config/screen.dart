@@ -20,11 +20,16 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
   Future saveConfig() async {
     var confProvider = context.read<ConfigProvider>();
-    confProvider.set(confProvider.receiverIpController.text, int.parse(confProvider.portSyncController.text));
+
+    var newSyncPort = int.parse(confProvider.portSyncController.text);
+    var newReceiverIp = confProvider.receiverIpController.text;
+
+    confProvider.set(newReceiverIp, newSyncPort);
+    
     var box = await Hive.openBox("cfg");
     box.putAt(0, {
-      "receiverIp": "${confProvider.receiverIpController.text}",
-      "port": confProvider.port
+      "receiverIp": newReceiverIp,
+      "portSync": newSyncPort
     });
   }
 
@@ -34,28 +39,30 @@ class _ConfigScreenState extends State<ConfigScreen> {
     
     return Scaffold(
       appBar: AppBar(title: Text("MyShare")),
-      body: Padding(
-        padding: const EdgeInsets.all(70.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              spacing: 0,
-              children: [
-                Expanded(child: ReceiverIpFieldWidget()),
-                Expanded(child: PortFieldWidget())
-              ],
-            ),
-            ElevatedButton(
-              child: Row(mainAxisAlignment: .center, children: [
-                Text("Save"),
-                Icon(Icons.done)
-              ],),
-              onPressed: () => saveConfig()
-            ),
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(70.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                spacing: 0,
+                children: [
+                  Expanded(child: ReceiverIpFieldWidget()),
+                  Expanded(child: PortFieldWidget())
+                ],
+              ),
+              ElevatedButton(
+                child: Row(mainAxisAlignment: .center, children: [
+                  Text("Save"),
+                  Icon(Icons.done)
+                ],),
+                onPressed: () => saveConfig()
+              ),
+            ],
+          ),
         ),
       ),
     );

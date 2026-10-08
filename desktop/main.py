@@ -15,7 +15,7 @@ async def client():
                 
                 # Подключаемся к серверу
                 reader, writer = await asyncio.wait_for(
-                    asyncio.open_connection("192.168.31.136", 5000),
+                    asyncio.open_connection("192.168.31.144", 5001),
                     timeout=3.0
                 )
                 
@@ -51,7 +51,7 @@ async def handle_server_client(reader, writer):
 
 async def server():
     # Запускаем полностью асинхронный сервер
-    server = await asyncio.start_server(handle_server_client, "0.0.0.0", 5000)
+    server = await asyncio.start_server(handle_server_client, "0.0.0.0", 5001)
     print("[Server] Запущен и ожидает подключений...")
     async with server:
         await server.serve_forever()

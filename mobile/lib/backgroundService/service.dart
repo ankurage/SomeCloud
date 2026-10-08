@@ -74,8 +74,10 @@ void onStart(ServiceInstance service) async {
 }
 
 Future<void> startServer(ConfigProvider config) async {
+  print(config.port);
   var server = await ServerSocket.bind(InternetAddress.anyIPv4, config.port);
   server.listen((Socket client) {
+    print("server listening");
     client.listen((Uint8List bytes) async {
       var data = utf8.decode(bytes);
       print(data);

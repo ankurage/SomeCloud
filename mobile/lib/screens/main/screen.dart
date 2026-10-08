@@ -47,34 +47,36 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: Stack(
-        alignment: .center,
-        children: [
-          MessageField(messageController: _messageController),
-          Align(
-            alignment: .bottomCenter,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IconButtonWidget(
-                      buttonPadding: EdgeInsetsGeometry.symmetric(vertical: 20),
-                      child: isServiceActive ? Text("Stop Sync") : Text("Start Sync"),
-                      onPressed: () {
-                        if (isServiceActive) {
-                          FlutterBackgroundService().invoke("stopService");
-                        } else {
-                          FlutterBackgroundService().startService();
-                        }
-                      },
+      body: SafeArea(
+        child: Stack(
+          alignment: .center,
+          children: [
+            MessageField(messageController: _messageController),
+            Align(
+              alignment: .bottomCenter,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: IconButtonWidget(
+                        buttonPadding: EdgeInsetsGeometry.symmetric(vertical: 20),
+                        child: isServiceActive ? Text("Stop Sync") : Text("Start Sync"),
+                        onPressed: () {
+                          if (isServiceActive) {
+                            FlutterBackgroundService().invoke("stopService");
+                          } else {
+                            FlutterBackgroundService().startService();
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

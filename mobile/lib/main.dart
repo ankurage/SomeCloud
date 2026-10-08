@@ -13,6 +13,13 @@ import 'screens/screens.dart';
 
 Future<void> initializeService(ConfigProvider configProv) async {
   final service = FlutterBackgroundService();
+  await Permission.notification.isDenied.then(
+    (value) {
+      if (value) {
+        Permission.notification.request();
+      }
+    }
+  );
 
   await service.configure(
     iosConfiguration: IosConfiguration(
@@ -40,15 +47,8 @@ Future<void> initializeService(ConfigProvider configProv) async {
   service.startService();
 }
 
-void main() async {
-  // final background = BackgroundServiceProvider();
-  final config = ConfigProvider();
-
-  WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized();
+Future DatabaseInit(ConfigProvider config) async {
   await Hive.initFlutter();
-  await startServer(config);
-
   var box = await Hive.openBox("cfg");
   if (box.isEmpty) {
     box.add(
@@ -59,16 +59,19 @@ void main() async {
     );
   }
   var data = box.get(0);
-  config.set(data["receiverIp"] ?? "192.168.1.1", data["portSync"] ?? 5000);
 
-  await Permission.notification.isDenied.then(
-    (value) {
-      if (value) {
-        Permission.notification.request();
-      }
-    }
-  );
+  config.set(data["receiverIp"] ?? "192.168.1.1", data["portSync"] ?? 5000);
+}
+
+void main() async {
+  final config = ConfigProvider();
+
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  
+  await DatabaseInit(config);
   await initializeService(config);
+  await startServer(config);
   
   runApp(
     MultiProvider(
